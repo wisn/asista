@@ -1,0 +1,49 @@
+<header>
+  <h1>Asista</h1>
+  <h2>Asisten Pribadimu</h2>
+</header>
+<main>
+  <div align="center">
+    <%= form_tag(:parse, method: "post", id: "form") do %>
+      <input type="text" id="argument" name="argument" placeholder="Perintah..." autofocus autocomplete="off">
+      <input type="submit" hidden>
+    <% end %>
+  </div>
+
+  <div style="padding: 2em"></div>
+
+  <div align="center" id="root"></div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    $('#form').submit(function(e) {
+      e.preventDefault();
+
+      var app = $('#root')[0];
+      var arg = $('#argument')[0];
+      var token = $('input[name=authenticity_token]')[0].value;
+      var argument = arg.value;
+
+      arg.value = '';
+      app.innerHTML = 'Memuat...';
+
+      $.post('/parse', {argument: argument, authenticity_token: token})
+        .done(function(res) {
+          if (res.status == "false")
+            app.innerHTML = 'Terjadi masalah saat memproses data...';
+          else
+            app.innerHTML = res.data;
+
+          console.log(res);
+        })
+        .fail(function(err) {
+          app.innerHTML = 'Terjadi masalah saat memproses data...';
+
+          console.log(err);
+        });
+    })
+  });
+</script>
